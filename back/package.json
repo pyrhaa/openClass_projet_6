@@ -1,0 +1,14 @@
+{
+  "name": "openclass_projet_6",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand"
+  },
+  "author": "pyrhaaⵣ",
+  "license": "MIT"
+}
