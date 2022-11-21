@@ -9,6 +9,28 @@
   "scripts": {
     "test": "cross-env NODE_ENV=test jest --verbose --runInBand"
   },
-  "author": "pyrhaaⵣ",
-  "license": "MIT"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pyrhaa/openClass_projet_6.git"
+  },
+  "author": "pyrhaaⵣ Sarah Boubtane",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pyrhaa/openClass_projet_6/issues"
+  },
+  "homepage": "https://github.com/pyrhaa/openClass_projet_6#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^14.2.0",
+    "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.1.7"
+  },
+  "devDependencies": {
+    "jest": "^27.4.7",
+    "nodemon": "^2.0.15",
+    "supertest": "^6.2.2"
+  }
 }
