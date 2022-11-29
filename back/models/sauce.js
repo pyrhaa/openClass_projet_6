@@ -50,7 +50,7 @@ const sauceSchema = new mongoose.Schema({
   }
 });
 
-blogSchema.set('toJSON', {
+sauceSchema.set('toJSON', {
   transform: (document, returnedObj) => {
     returnedObj.id = returnedObj._id.toString();
     delete returnedObj._id;

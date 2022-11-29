@@ -2,6 +2,9 @@ const config = require('./utils/config');
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const saucesRouter = require('./controllers/sauces');
+const usersRouter = require('./controllers/signup');
+const loginRouter = require('./controllers/login');
 const middleware = require('./utils/middleware');
 const logger = require('./utils/logger');
 const mongoose = require('mongoose');
@@ -23,5 +26,8 @@ app.use(middleware.tokenExtractor);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
+app.use('/api/auth', loginRouter);
+app.use('/api/auth', usersRouter);
+app.use('/api/sauces', middleware.userExtractor, saucesRouter);
 
 module.exports = app;
