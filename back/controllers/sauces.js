@@ -11,16 +11,16 @@ saucesRouter.get('/', async (req, res) => {
   }
 });
 
-// blogsRouter.get('/:id', async (req, res) => {
-//   try {
-//     const idBlog = await Blog.findById(req.params.id);
-//     res.json(idBlog.toJSON());
-//   } catch (error) {
-//     res.status(404).end();
-//   }
-// });
+saucesRouter.get('/:id', async (req, res) => {
+  try {
+    const idSauce = await Sauce.findById(req.params.id);
+    res.json(idSauce.toJSON());
+  } catch (error) {
+    res.status(404).end();
+  }
+});
 
-// blogsRouter.post('/', async (req, res) => {
+// saucesRouter.post('/', async (req, res) => {
 //   const token = req.token;
 //   const decodedToken = jwt.verify(token, process.env.SECRET);
 

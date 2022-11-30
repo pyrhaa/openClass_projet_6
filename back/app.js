@@ -24,10 +24,10 @@ app.use(cors());
 app.use(express.json());
 app.use(middleware.tokenExtractor);
 
-app.use(middleware.unknownEndpoint);
+// app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 app.use('/api/auth', loginRouter);
 app.use('/api/auth', usersRouter);
-app.use('/api/sauces', middleware.userExtractor, saucesRouter);
+app.use('/api/sauces', saucesRouter);
 
 module.exports = app;
