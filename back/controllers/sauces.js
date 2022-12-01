@@ -1,6 +1,7 @@
 const saucesRouter = require('express').Router();
 const jwt = require('jsonwebtoken');
 const Sauce = require('../models/sauce');
+const fs = require('fs');
 
 saucesRouter.get('/', async (req, res) => {
   try {
@@ -37,7 +38,9 @@ saucesRouter.post('/', async (req, res) => {
       manufacturer: body.manufacturer,
       description: body.description,
       mainPepper: body.mainPepper,
-      imageUrl: body.imageUrl,
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${
+        req.file.filename
+      }`,
       heat: body.heat,
       likes: body.likes,
       dislikes: body.dislikes,
@@ -61,7 +64,9 @@ saucesRouter.put('/:id', async (req, res) => {
       manufacturer: body.manufacturer,
       description: body.description,
       mainPepper: body.mainPepper,
-      imageUrl: body.imageUrl,
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${
+        req.file.filename
+      }`,
       heat: body.heat,
       likes: body.likes,
       dislikes: body.dislikes,
@@ -90,12 +95,19 @@ saucesRouter.delete('/:id', async (req, res) => {
     const sauce = await Sauce.findById(id);
     const user = req.user;
 
-    if (sauce.userId.toString() === user.id.toString()) {
-      await Sauce.findByIdAndRemove(id);
-      res.status(204).end();
-    } else {
+    if (sauce.userId.toString() !== user.id.toString()) {
       return res.status(401).json({
         error: 'Unauthorized to access blog, fail to remove'
+      });
+    } else {
+      const filename = sauce.imageUrl.split('/images/')[1];
+      fs.unlink(`images/${filename}`, async () => {
+        try {
+          await Sauce.findByIdAndRemove(id);
+          res.status(204).end();
+        } catch (error) {
+          res.status(401).json({ error });
+        }
       });
     }
   } catch (error) {
