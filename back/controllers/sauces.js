@@ -52,24 +52,30 @@ saucesRouter.post('/', async (req, res) => {
   }
 });
 
-// blogsRouter.put('/:id', async (req, res) => {
-//   try {
-//     const body = req.body;
+saucesRouter.put('/:id', async (req, res) => {
+  try {
+    const body = req.body;
 
-//     const blog = {
-//       title: body.title,
-//       author: body.author,
-//       url: body.url,
-//       likes: body.likes
-//     };
-//     const updateIdBlog = await Blog.findByIdAndUpdate(req.params.id, blog, {
-//       new: true
-//     });
-//     res.json(updateIdBlog.toJSON());
-//   } catch (error) {
-//     response.status(400).end();
-//   }
-// });
+    const sauce = {
+      name: body.name,
+      manufacturer: body.manufacturer,
+      description: body.description,
+      mainPepper: body.mainPepper,
+      imageUrl: body.imageUrl,
+      heat: body.heat,
+      likes: body.likes,
+      dislikes: body.dislikes,
+      usersLiked: body.usersLiked,
+      usersDisliked: body.usersDisliked
+    };
+    const updateIdSauce = await Sauce.findByIdAndUpdate(req.params.id, sauce, {
+      new: true
+    });
+    res.json(updateIdSauce.toJSON());
+  } catch (error) {
+    response.status(400).end();
+  }
+});
 
 // blogsRouter.delete('/:id', async (req, res) => {
 //   const token = req.token;
