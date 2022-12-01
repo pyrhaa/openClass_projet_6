@@ -4,7 +4,7 @@ const Sauce = require('../models/sauce');
 
 saucesRouter.get('/', async (req, res) => {
   try {
-    const sauces = await Sauce.find();
+    const sauces = await Sauce.find().populate('user');
     res.json(sauces);
   } catch (error) {
     res.status(404).end();
@@ -20,33 +20,37 @@ saucesRouter.get('/:id', async (req, res) => {
   }
 });
 
-// saucesRouter.post('/', async (req, res) => {
-//   const token = req.token;
-//   const decodedToken = jwt.verify(token, process.env.SECRET);
+saucesRouter.post('/', async (req, res) => {
+  const token = req.token;
+  const decodedToken = jwt.verify(token, process.env.SECRET);
 
-//   if (!token || !decodedToken) {
-//     return res.status(401).json({ error: 'token missing or invalid' });
-//   }
-//   try {
-//     const body = req.body;
-//     const user = req.user;
+  if (!token || !decodedToken) {
+    return res.status(401).json({ error: 'token missing or invalid' });
+  }
+  try {
+    const body = req.body;
+    const user = req.user;
 
-//     const blog = new Blog({
-//       title: body.title,
-//       author: body.author,
-//       url: body.url,
-//       likes: body.likes,
-//       user: user._id
-//     });
+    const sauce = new Sauce({
+      userId: user._id,
+      name: body.name,
+      manufacturer: body.manufacturer,
+      description: body.description,
+      mainPepper: body.mainPepper,
+      imageUrl: body.imageUrl,
+      heat: body.heat,
+      likes: body.likes,
+      dislikes: body.dislikes,
+      usersLiked: body.usersLiked,
+      usersDisliked: body.usersDisliked
+    });
 
-//     const savedBlog = await blog.save();
-//     user.blogs = user.blogs.concat(savedBlog._id);
-//     await user.save();
-//     res.status(201).json(savedBlog);
-//   } catch (error) {
-//     res.status(400).end();
-//   }
-// });
+    const savedSauce = await sauce.save();
+    res.status(201).json(savedSauce);
+  } catch (error) {
+    res.status(400).end();
+  }
+});
 
 // blogsRouter.put('/:id', async (req, res) => {
 //   try {
