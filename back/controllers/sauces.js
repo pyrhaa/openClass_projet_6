@@ -4,7 +4,7 @@ const Sauce = require('../models/sauce');
 
 saucesRouter.get('/', async (req, res) => {
   try {
-    const sauces = await Sauce.find().populate('user');
+    const sauces = await Sauce.find();
     res.json(sauces);
   } catch (error) {
     res.status(404).end();
@@ -77,29 +77,30 @@ saucesRouter.put('/:id', async (req, res) => {
   }
 });
 
-// blogsRouter.delete('/:id', async (req, res) => {
-//   const token = req.token;
-//   const decodedToken = jwt.verify(token, process.env.SECRET);
+saucesRouter.delete('/:id', async (req, res) => {
+  const token = req.token;
+  const decodedToken = jwt.verify(token, process.env.SECRET);
 
-//   if (!decodedToken.id || !token || !decodedToken) {
-//     return res.status(401).json({ error: 'token missing or invalid' });
-//   }
+  if (!decodedToken.id || !token || !decodedToken) {
+    return res.status(401).json({ error: 'token missing or invalid' });
+  }
 
-//   try {
-//     const id = req.params.id;
-//     const blog = await Blog.findById(id);
-//     const user = req.user;
-//     if (blog.user.toString() === user.id.toString()) {
-//       await Blog.findByIdAndRemove(id);
-//       res.status(204).end();
-//     } else {
-//       return res.status(401).json({
-//         error: 'Unauthorized to access blog, fail to remove'
-//       });
-//     }
-//   } catch (error) {
-//     res.status(400).end();
-//   }
-// });
+  try {
+    const id = req.params.id;
+    const sauce = await Sauce.findById(id);
+    const user = req.user;
+
+    if (sauce.userId.toString() === user.id.toString()) {
+      await Sauce.findByIdAndRemove(id);
+      res.status(204).end();
+    } else {
+      return res.status(401).json({
+        error: 'Unauthorized to access blog, fail to remove'
+      });
+    }
+  } catch (error) {
+    res.status(400).end();
+  }
+});
 
 module.exports = saucesRouter;
