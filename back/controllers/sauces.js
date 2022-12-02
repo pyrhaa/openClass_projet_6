@@ -1,7 +1,8 @@
 const saucesRouter = require('express').Router();
 const jwt = require('jsonwebtoken');
 const Sauce = require('../models/sauce');
-const fs = require('fs');
+const multer = require('../utils/multer-config');
+// const fs = require('fs')
 
 saucesRouter.get('/', async (req, res) => {
   try {
@@ -21,98 +22,103 @@ saucesRouter.get('/:id', async (req, res) => {
   }
 });
 
-saucesRouter.post('/', async (req, res) => {
+saucesRouter.post('/', multer, async (req, res) => {
   const token = req.token;
   const decodedToken = jwt.verify(token, process.env.SECRET);
 
   if (!token || !decodedToken) {
     return res.status(401).json({ error: 'token missing or invalid' });
   }
-  try {
-    const body = req.body;
-    const user = req.user;
+  // console.log('BODY: ', req.body);
+  // console.log('FILE: ', req.file);
+  // res.json({ message: 'Successfully uploaded file' });
 
-    const sauce = new Sauce({
-      userId: user._id,
-      name: body.name,
-      manufacturer: body.manufacturer,
-      description: body.description,
-      mainPepper: body.mainPepper,
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${
-        req.file.filename
-      }`,
-      heat: body.heat,
-      likes: body.likes,
-      dislikes: body.dislikes,
-      usersLiked: body.usersLiked,
-      usersDisliked: body.usersDisliked
-    });
+  // try {
+  const body = req.body;
+  const user = req.user;
 
-    const savedSauce = await sauce.save();
-    res.status(201).json(savedSauce);
-  } catch (error) {
-    res.status(400).end();
-  }
+  const sauce = new Sauce({
+    userId: user._id,
+    name: body.name,
+    manufacturer: body.manufacturer,
+    description: body.description,
+    mainPepper: body.mainPepper,
+    imageUrl: `${req.protocol}://${req.get('host')}/images/${
+      req.file.filename
+    }`,
+    heat: body.heat,
+    likes: body.likes,
+    dislikes: body.dislikes,
+    usersLiked: body.usersLiked,
+    usersDisliked: body.usersDisliked
+  });
+  console.log('New sauce: ', sauce);
+  // const savedSauce = await sauce.save();
+
+  // res.status(201).json(savedSauce);
+  // } catch (error) {
+  //   res.status(400).end();
+  // }
 });
 
-saucesRouter.put('/:id', async (req, res) => {
-  try {
-    const body = req.body;
+// saucesRouter.put('/:id', multer, async (req, res) => {
+//   try {
+//     const body = req.body;
 
-    const sauce = {
-      name: body.name,
-      manufacturer: body.manufacturer,
-      description: body.description,
-      mainPepper: body.mainPepper,
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${
-        req.file.filename
-      }`,
-      heat: body.heat,
-      likes: body.likes,
-      dislikes: body.dislikes,
-      usersLiked: body.usersLiked,
-      usersDisliked: body.usersDisliked
-    };
-    const updateIdSauce = await Sauce.findByIdAndUpdate(req.params.id, sauce, {
-      new: true
-    });
-    res.json(updateIdSauce.toJSON());
-  } catch (error) {
-    response.status(400).end();
-  }
-});
+//     const sauce = {
+//       name: body.name,
+//       manufacturer: body.manufacturer,
+//       description: body.description,
+//       mainPepper: body.mainPepper,
+//       imageUrl: `${req.protocol}://${req.get('host')}/images/${
+//         req.file.filename
+//       }`,
+//       heat: body.heat,
+//       likes: body.likes,
+//       dislikes: body.dislikes,
+//       usersLiked: body.usersLiked,
+//       usersDisliked: body.usersDisliked
+//     };
+//     const updateIdSauce = await Sauce.findByIdAndUpdate(req.params.id, sauce, {
+//       new: true
+//     });
+//     res.json(updateIdSauce.toJSON());
+//   } catch (error) {
+//     response.status(400).end();
+//   }
+// });
 
-saucesRouter.delete('/:id', async (req, res) => {
-  const token = req.token;
-  const decodedToken = jwt.verify(token, process.env.SECRET);
+// saucesRouter.delete('/:id', multer, async (req, res) => {
+//   const token = req.token;
+//   const decodedToken = jwt.verify(token, process.env.SECRET);
 
-  if (!decodedToken.id || !token || !decodedToken) {
-    return res.status(401).json({ error: 'token missing or invalid' });
-  }
+//   if (!decodedToken.id || !token || !decodedToken) {
+//     return res.status(401).json({ error: 'token missing or invalid' });
+//   }
 
-  try {
-    const id = req.params.id;
-    const sauce = await Sauce.findById(id);
-    const user = req.user;
+//   try {
+//     const id = req.params.id;
+//     const sauce = await Sauce.findById(id);
+//     const user = req.user;
 
-    if (sauce.userId.toString() !== user.id.toString()) {
-      return res.status(401).json({
-        error: 'Unauthorized to access blog, fail to remove'
-      });
-    } else {
-      const filename = sauce.imageUrl.split('/images/')[1];
-      fs.unlink(`images/${filename}`, async () => {
-        try {
-          await Sauce.findByIdAndRemove(id);
-          res.status(204).end();
-        } catch (error) {
-          res.status(401).json({ error });
-        }
-      });
-    }
-  } catch (error) {
-    res.status(400).end();
-  }
-});
+//     if (sauce.userId.toString() !== user.id.toString()) {
+//       return res.status(401).json({
+//         error: 'Unauthorized to access blog, fail to remove'
+//       });
+//     } else {
+//       const filename = sauce.imageUrl.split('/images/')[1];
+//       fs.unlink(`images/${filename}`, async () => {
+//         try {
+//           await Sauce.findByIdAndRemove(id);
+//           res.status(204).end();
+//         } catch (error) {
+//           res.status(401).json({ error });
+//         }
+//       });
+//     }
+//   } catch (error) {
+//     res.status(400).end();
+//   }
+// });
 
 module.exports = saucesRouter;
