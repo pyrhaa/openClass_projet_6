@@ -9,10 +9,9 @@ import { catchError, EMPTY, switchMap, tap } from 'rxjs';
 @Component({
   selector: 'app-sauce-form',
   templateUrl: './sauce-form.component.html',
-  styleUrls: ['./sauce-form.component.scss']
+  styleUrls: ['./sauce-form.component.scss'],
 })
 export class SauceFormComponent implements OnInit {
-
   sauceForm!: FormGroup;
   mode!: string;
   loading!: boolean;
@@ -20,35 +19,39 @@ export class SauceFormComponent implements OnInit {
   errorMsg!: string;
   imagePreview!: string;
 
-  constructor(private formBuilder: FormBuilder,
-              private route: ActivatedRoute,
-              private router: Router,
-              private sauces: SaucesService,
-              private auth: AuthService) { }
+  constructor(
+    private formBuilder: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private sauces: SaucesService,
+    private auth: AuthService
+  ) {}
 
   ngOnInit() {
     this.loading = true;
-    this.route.params.pipe(
-      switchMap(params => {
-        if (!params['id']) {
-          this.mode = 'new';
-          this.initEmptyForm();
-          this.loading = false;
-          return EMPTY;
-        } else {
-          this.mode = 'edit';
-          return this.sauces.getSauceById(params['id'])
-        }
-      }),
-      tap(sauce => {
-        if (sauce) {
-          this.sauce = sauce;
-          this.initModifyForm(sauce);
-          this.loading = false;
-        }
-      }),
-      catchError(error => this.errorMsg = JSON.stringify(error))
-    ).subscribe();
+    this.route.params
+      .pipe(
+        switchMap((params) => {
+          if (!params['id']) {
+            this.mode = 'new';
+            this.initEmptyForm();
+            this.loading = false;
+            return EMPTY;
+          } else {
+            this.mode = 'edit';
+            return this.sauces.getSauceById(params['id']);
+          }
+        }),
+        tap((sauce) => {
+          if (sauce) {
+            this.sauce = sauce;
+            this.initModifyForm(sauce);
+            this.loading = false;
+          }
+        }),
+        catchError((error) => (this.errorMsg = JSON.stringify(error)))
+      )
+      .subscribe();
   }
 
   initEmptyForm() {
@@ -59,13 +62,11 @@ export class SauceFormComponent implements OnInit {
       image: [null, Validators.required],
       mainPepper: [null, Validators.required],
       heat: [1, Validators.required],
-      heatValue: [{value: 1, disabled: true}]
+      heatValue: [{ value: 1, disabled: true }],
     });
-    this.sauceForm.get('heat')!.valueChanges.subscribe(
-      (value) => {
-        this.sauceForm.get('heatValue')!.setValue(value);
-      }
-    );
+    this.sauceForm.get('heat')!.valueChanges.subscribe((value) => {
+      this.sauceForm.get('heatValue')!.setValue(value);
+    });
   }
 
   initModifyForm(sauce: Sauce) {
@@ -76,13 +77,11 @@ export class SauceFormComponent implements OnInit {
       image: [sauce.imageUrl, Validators.required],
       mainPepper: [sauce.mainPepper, Validators.required],
       heat: [sauce.heat, Validators.required],
-      heatValue: [{value: sauce.heat, disabled: true}]
+      heatValue: [{ value: sauce.heat, disabled: true }],
     });
-    this.sauceForm.get('heat')!.valueChanges.subscribe(
-      (value) => {
-        this.sauceForm.get('heatValue')!.setValue(value);
-      }
-    );
+    this.sauceForm.get('heat')!.valueChanges.subscribe((value) => {
+      this.sauceForm.get('heatValue')!.setValue(value);
+    });
     this.imagePreview = this.sauce.imageUrl;
   }
 
@@ -96,33 +95,43 @@ export class SauceFormComponent implements OnInit {
     newSauce.heat = this.sauceForm.get('heat')!.value;
     newSauce.userId = this.auth.getUserId();
     if (this.mode === 'new') {
-      this.sauces.createSauce(newSauce, this.sauceForm.get('image')!.value).pipe(
-        tap(({ message }) => {
-          console.log(message);
-          this.loading = false;
-          this.router.navigate(['/sauces']);
-        }),
-        catchError(error => {
-          console.error(error);
-          this.loading = false;
-          this.errorMsg = error.message;
-          return EMPTY;
-        })
-      ).subscribe();
+      this.sauces
+        .createSauce(newSauce, this.sauceForm.get('image')!.value)
+        .pipe(
+          tap(({ message }) => {
+            console.log(message);
+            this.loading = false;
+            this.router.navigate(['/sauces']);
+          }),
+          catchError((error) => {
+            console.error(error);
+            this.loading = false;
+            this.errorMsg = error.message;
+            return EMPTY;
+          })
+        )
+        .subscribe();
     } else if (this.mode === 'edit') {
-      this.sauces.modifySauce(this.sauce._id, newSauce, this.sauceForm.get('image')!.value).pipe(
-        tap(({ message }) => {
-          console.log(message);
-          this.loading = false;
-          this.router.navigate(['/sauces']);
-        }),
-        catchError(error => {
-          console.error(error);
-          this.loading = false;
-          this.errorMsg = error.message;
-          return EMPTY;
-        })
-      ).subscribe();
+      this.sauces
+        .modifySauce(
+          this.sauce.id,
+          newSauce,
+          this.sauceForm.get('image')!.value
+        )
+        .pipe(
+          tap(({ message }) => {
+            console.log(message);
+            this.loading = false;
+            this.router.navigate(['/sauces']);
+          }),
+          catchError((error) => {
+            console.error(error);
+            this.loading = false;
+            this.errorMsg = error.message;
+            return EMPTY;
+          })
+        )
+        .subscribe();
     }
   }
 
