@@ -70,7 +70,7 @@ saucesRouter.post('/', multer, async (req, res) => {
   }
 });
 
-saucesRouter.put('/:id', multer, (req, res) => {
+saucesRouter.put('/:id', multer, async (req, res) => {
   const token = req.token;
   const decodedToken = jwt.verify(token, process.env.SECRET);
 
@@ -81,24 +81,21 @@ saucesRouter.put('/:id', multer, (req, res) => {
     let sauceObject = {};
 
     if (req.file) {
-      Sauce.findOne({
-        id: req.params.id
-      }).then((sauce) => {
-        const filename = sauce.imageUrl.split('/images/')[1];
-        fs.unlinkSync(`images/${filename}`);
-      }),
-        (sauceObject = {
-          ...JSON.parse(req.body.sauce),
-          imageUrl: `${req.protocol}://${req.get('host')}/images/${
-            req.file.filename
-          }`
-        });
+      const sauce = await Sauce.findOne({ id: req.params.id });
+      const filename = sauce.imageUrl.split('/images/')[1];
+      fs.unlinkSync(`images/${filename}`);
+      sauceObject = {
+        ...JSON.parse(req.body.sauce),
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${
+          req.file.filename
+        }`
+      };
     } else {
       sauceObject = {
         ...req.body
       };
     }
-    Sauce.updateOne(
+    await Sauce.updateOne(
       {
         id: req.params.id
       },
@@ -106,11 +103,10 @@ saucesRouter.put('/:id', multer, (req, res) => {
         ...sauceObject,
         id: req.params.id
       }
-    ).then(() =>
-      res.status(200).json({
-        message: 'Sauce modifiée !'
-      })
     );
+    res.status(200).json({
+      message: 'Sauce modifiée !'
+    });
   } catch (error) {
     res.status(400).end();
   }
