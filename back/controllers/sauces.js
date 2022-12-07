@@ -58,29 +58,41 @@ saucesRouter.post('/', multer, async (req, res) => {
   }
 });
 
-saucesRouter.put('/:id', multer, async (req, res) => {
+saucesRouter.put('/:id', multer, (req, res) => {
   try {
-    const content = JSON.parse(req.body.sauce);
+    let sauceObject = {};
 
-    const sauce = {
-      userId: user._id,
-      name: content.name,
-      manufacturer: content.manufacturer,
-      description: content.description,
-      mainPepper: content.mainPepper,
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${
-        req.file.filename
-      }`,
-      heat: content.heat,
-      likes: content.likes,
-      dislikes: content.dislikes,
-      usersLiked: content.usersLiked,
-      usersDisliked: content.usersDisliked
-    };
-    const updateIdSauce = await Sauce.findByIdAndUpdate(req.params.id, sauce, {
-      new: true
-    });
-    res.json(updateIdSauce.toJSON());
+    if (req.file) {
+      Sauce.findOne({
+        id: req.params.id
+      }).then((sauce) => {
+        const filename = sauce.imageUrl.split('/images/')[1];
+        fs.unlinkSync(`images/${filename}`);
+      }),
+        (sauceObject = {
+          ...JSON.parse(req.body.sauce),
+          imageUrl: `${req.protocol}://${req.get('host')}/images/${
+            req.file.filename
+          }`
+        });
+    } else {
+      sauceObject = {
+        ...req.body
+      };
+    }
+    Sauce.updateOne(
+      {
+        id: req.params.id
+      },
+      {
+        ...sauceObject,
+        id: req.params.id
+      }
+    ).then(() =>
+      res.status(200).json({
+        message: 'Sauce modifiée !'
+      })
+    );
   } catch (error) {
     res.status(400).end();
   }
