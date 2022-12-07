@@ -15,7 +15,7 @@ saucesRouter.get('/', async (req, res) => {
     const sauces = await Sauce.find();
     res.json(sauces);
   } catch (error) {
-    res.status(404).end();
+    res.status(404).end(error);
   }
 });
 
@@ -30,7 +30,7 @@ saucesRouter.get('/:id', async (req, res) => {
     const idSauce = await Sauce.findById(req.params.id);
     res.json(idSauce.toJSON());
   } catch (error) {
-    res.status(404).end();
+    res.status(404).end(error);
   }
 });
 
@@ -108,7 +108,7 @@ saucesRouter.put('/:id', multer, async (req, res) => {
       message: 'Sauce modifiée !'
     });
   } catch (error) {
-    res.status(400).end();
+    res.status(400).end(error);
   }
 });
 
@@ -141,7 +141,67 @@ saucesRouter.delete('/:id', multer, async (req, res) => {
       });
     }
   } catch (error) {
-    res.status(400).end();
+    res.status(400).end(error);
+  }
+});
+
+saucesRouter.post('/:id/like', async (req, res) => {
+  const token = req.token;
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+
+  if (!decodedToken.id || !token || !decodedToken) {
+    return res.status(401).json({ error: 'token missing or invalid' });
+  }
+
+  try {
+    const sauce = await Sauce.findOne({ id: req.params.id });
+
+    if (req.body.like === 1) {
+      if (sauce.usersLiked.includes(req.body.userId)) {
+        res.status(401).json({ error: 'Already liked' });
+      }
+      await Sauce.updateOne(
+        { id: req.params.id },
+        {
+          $inc: { likes: req.body.like++ },
+          $push: { usersLiked: req.body.userId }
+        }
+      );
+      res.status(200).json({ message: 'Like!' });
+    } else if (req.body.like === -1) {
+      if (sauce.usersDisliked.includes(req.body.userId)) {
+        res.status(401).json({ error: 'Already disliked' });
+      }
+      await Sauce.updateOne(
+        { id: req.params.id },
+        {
+          $inc: { dislikes: req.body.like++ * -1 },
+          $push: { usersDisliked: req.body.userId }
+        }
+      );
+      res.status(200).json({ message: 'Dislike!' });
+    } else {
+      if (sauce.usersLiked.includes(req.body.userId)) {
+        await Sauce.updateOne(
+          { id: req.params.id },
+          { $pull: { usersLiked: req.body.userId }, $inc: { likes: -1 } }
+        );
+
+        res.status(200).json({ message: 'Like cancelled!' });
+      } else if (sauce.usersDisliked.includes(req.body.userId)) {
+        await Sauce.updateOne(
+          { id: req.params.id },
+          {
+            $pull: { usersDisliked: req.body.userId },
+            $inc: { dislikes: -1 }
+          }
+        );
+
+        res.status(200).json({ message: 'Dislike cancelled!' });
+      }
+    }
+  } catch (error) {
+    res.status(400).json({ error });
   }
 });
 
