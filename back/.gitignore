@@ -1,5 +1,5 @@
 node_modules
-images/
+images
 npm-debug.log
 .env
 .DS_Store
