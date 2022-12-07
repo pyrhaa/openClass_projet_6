@@ -5,6 +5,12 @@ const multer = require('../utils/multer-config');
 const fs = require('fs');
 
 saucesRouter.get('/', async (req, res) => {
+  const token = req.token;
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+
+  if (!token || !decodedToken) {
+    return res.status(401).json({ error: 'token missing or invalid' });
+  }
   try {
     const sauces = await Sauce.find();
     res.json(sauces);
@@ -14,6 +20,12 @@ saucesRouter.get('/', async (req, res) => {
 });
 
 saucesRouter.get('/:id', async (req, res) => {
+  const token = req.token;
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+
+  if (!token || !decodedToken) {
+    return res.status(401).json({ error: 'token missing or invalid' });
+  }
   try {
     const idSauce = await Sauce.findById(req.params.id);
     res.json(idSauce.toJSON());
@@ -59,6 +71,12 @@ saucesRouter.post('/', multer, async (req, res) => {
 });
 
 saucesRouter.put('/:id', multer, (req, res) => {
+  const token = req.token;
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+
+  if (!token || !decodedToken) {
+    return res.status(401).json({ error: 'token missing or invalid' });
+  }
   try {
     let sauceObject = {};
 
