@@ -7,14 +7,16 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-sauce-list',
   templateUrl: './sauce-list.component.html',
-  styleUrls: ['./sauce-list.component.scss'],
+  styleUrls: ['./sauce-list.component.scss']
 })
 export class SauceListComponent implements OnInit {
+
   sauces$!: Observable<Sauce[]>;
   loading!: boolean;
   errorMsg!: string;
 
-  constructor(private sauce: SaucesService, private router: Router) {}
+  constructor(private sauce: SaucesService,
+              private router: Router) { }
 
   ngOnInit() {
     this.loading = true;
@@ -23,7 +25,7 @@ export class SauceListComponent implements OnInit {
         this.loading = false;
         this.errorMsg = '';
       }),
-      catchError((error) => {
+      catchError(error => {
         this.errorMsg = JSON.stringify(error);
         this.loading = false;
         return of([]);
@@ -33,6 +35,7 @@ export class SauceListComponent implements OnInit {
   }
 
   onClickSauce(id: string) {
-    this.router.navigate(['sauces', id]);
+    this.router.navigate(['sauce', id]);
   }
+
 }

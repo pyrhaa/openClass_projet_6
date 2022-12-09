@@ -33,8 +33,6 @@ usersRouter.post('/signup', async (req, res) => {
       const savedUser = await user.save();
       res.status(201).json(savedUser);
     } catch (error) {
-      console.log('res: ', res);
-      console.log('error arg: ', error);
       res
         .status(400)
         .send('Registration failed, user with this mail already exist');

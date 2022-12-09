@@ -7,7 +7,7 @@ import { catchError, EMPTY, switchMap, tap } from 'rxjs';
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.scss'],
+  styleUrls: ['./signup.component.scss']
 })
 export class SignupComponent implements OnInit {
   signupForm!: FormGroup;
@@ -23,7 +23,7 @@ export class SignupComponent implements OnInit {
   ngOnInit() {
     this.signupForm = this.formBuilder.group({
       email: [null, [Validators.required, Validators.email]],
-      password: [null, Validators.required],
+      password: [null, Validators.required]
     });
   }
 

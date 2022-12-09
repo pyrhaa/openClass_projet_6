@@ -9,7 +9,7 @@ import { catchError, EMPTY, switchMap, tap } from 'rxjs';
 @Component({
   selector: 'app-sauce-form',
   templateUrl: './sauce-form.component.html',
-  styleUrls: ['./sauce-form.component.scss'],
+  styleUrls: ['./sauce-form.component.scss']
 })
 export class SauceFormComponent implements OnInit {
   sauceForm!: FormGroup;
@@ -62,7 +62,7 @@ export class SauceFormComponent implements OnInit {
       image: [null, Validators.required],
       mainPepper: [null, Validators.required],
       heat: [1, Validators.required],
-      heatValue: [{ value: 1, disabled: true }],
+      heatValue: [{ value: 1, disabled: true }]
     });
     this.sauceForm.get('heat')!.valueChanges.subscribe((value) => {
       this.sauceForm.get('heatValue')!.setValue(value);
@@ -77,7 +77,7 @@ export class SauceFormComponent implements OnInit {
       image: [sauce.imageUrl, Validators.required],
       mainPepper: [sauce.mainPepper, Validators.required],
       heat: [sauce.heat, Validators.required],
-      heatValue: [{ value: sauce.heat, disabled: true }],
+      heatValue: [{ value: sauce.heat, disabled: true }]
     });
     this.sauceForm.get('heat')!.valueChanges.subscribe((value) => {
       this.sauceForm.get('heatValue')!.setValue(value);
@@ -114,7 +114,7 @@ export class SauceFormComponent implements OnInit {
     } else if (this.mode === 'edit') {
       this.sauces
         .modifySauce(
-          this.sauce.id,
+          this.sauce._id,
           newSauce,
           this.sauceForm.get('image')!.value
         )

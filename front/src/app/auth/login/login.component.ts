@@ -7,7 +7,7 @@ import { catchError, EMPTY, tap } from 'rxjs';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
@@ -23,7 +23,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
       email: [null, [Validators.required, Validators.email]],
-      password: [null, Validators.required],
+      password: [null, Validators.required]
     });
   }
 

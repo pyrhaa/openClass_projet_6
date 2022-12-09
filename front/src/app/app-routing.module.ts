@@ -11,28 +11,16 @@ const routes: Routes = [
   { path: 'signup', component: SignupComponent },
   { path: 'login', component: LoginComponent },
   { path: 'sauces', component: SauceListComponent, canActivate: [AuthGuard] },
-  {
-    path: 'sauces/:id',
-    component: SingleSauceComponent,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'new-sauce',
-    component: SauceFormComponent,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'modify-sauce/:id',
-    component: SauceFormComponent,
-    canActivate: [AuthGuard],
-  },
-  { path: '', pathMatch: 'full', redirectTo: 'sauces' },
-  { path: '**', redirectTo: 'sauces' },
+  { path: 'sauce/:id', component: SingleSauceComponent, canActivate: [AuthGuard] },
+  { path: 'new-sauce', component: SauceFormComponent, canActivate: [AuthGuard] },
+  { path: 'modify-sauce/:id', component: SauceFormComponent, canActivate: [AuthGuard] },
+  { path: '', pathMatch: 'full', redirectTo: 'sauces'},
+  { path: '**', redirectTo: 'sauces' }
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
-  providers: [AuthGuard],
+  providers: [AuthGuard]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

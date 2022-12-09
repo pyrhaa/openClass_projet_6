@@ -62,9 +62,9 @@ saucesRouter.post('/', multer, async (req, res) => {
       usersDisliked: content.usersDisliked
     });
 
-    const savedSauce = await sauce.save();
+    await sauce.save();
 
-    res.status(201).json(savedSauce);
+    res.status(201).json({ message: 'Sauce added !' });
   } catch (error) {
     res.status(400).end(error);
   }
@@ -81,7 +81,7 @@ saucesRouter.put('/:id', multer, async (req, res) => {
     let sauceObject = {};
 
     if (req.file) {
-      const sauce = await Sauce.findOne({ id: req.params.id });
+      const sauce = await Sauce.findOne({ _id: req.params.id });
       const filename = sauce.imageUrl.split('/images/')[1];
       fs.unlinkSync(`images/${filename}`);
       sauceObject = {
@@ -97,14 +97,14 @@ saucesRouter.put('/:id', multer, async (req, res) => {
     }
     await Sauce.updateOne(
       {
-        id: req.params.id
+        _id: req.params.id
       },
       {
         ...sauceObject,
-        id: req.params.id
+        _id: req.params.id
       }
     );
-    res.status(200).send('Sauce modifiée !');
+    res.status(200).json({ message: 'Sauce modified' });
   } catch (error) {
     res.status(400).end(error);
   }
@@ -152,50 +152,50 @@ saucesRouter.post('/:id/like', async (req, res) => {
   }
 
   try {
-    const sauce = await Sauce.findOne({ id: req.params.id });
+    const sauce = await Sauce.findOne({ _id: req.params.id });
 
     if (req.body.like === 1) {
       if (sauce.usersLiked.includes(req.body.userId)) {
         res.status(401).send('Already liked');
       }
       await Sauce.updateOne(
-        { id: req.params.id },
+        { _id: req.params.id },
         {
           $inc: { likes: req.body.like++ },
           $push: { usersLiked: req.body.userId }
         }
       );
-      res.status(200).send('Like!');
+      res.status(200).json({ message: 'Like!' });
     } else if (req.body.like === -1) {
       if (sauce.usersDisliked.includes(req.body.userId)) {
         res.status(401).send('Already disliked');
       }
       await Sauce.updateOne(
-        { id: req.params.id },
+        { _id: req.params.id },
         {
           $inc: { dislikes: req.body.like++ * -1 },
           $push: { usersDisliked: req.body.userId }
         }
       );
-      res.status(200).send('Dislike!');
+      res.status(200).json({ message: 'Dislike !' });
     } else {
       if (sauce.usersLiked.includes(req.body.userId)) {
         await Sauce.updateOne(
-          { id: req.params.id },
+          { _id: req.params.id },
           { $pull: { usersLiked: req.body.userId }, $inc: { likes: -1 } }
         );
 
-        res.status(200).send('Like cancelled!');
+        res.status(200).json({ message: 'Like cancelled !' });
       } else if (sauce.usersDisliked.includes(req.body.userId)) {
         await Sauce.updateOne(
-          { id: req.params.id },
+          { _id: req.params.id },
           {
             $pull: { usersDisliked: req.body.userId },
             $inc: { dislikes: -1 }
           }
         );
 
-        res.status(200).send('Dislike cancelled!');
+        res.status(200).json({ message: 'Dislike cancelled !' });
       }
     }
   } catch (error) {
