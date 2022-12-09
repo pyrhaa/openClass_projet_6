@@ -40,9 +40,8 @@ export class SignupComponent implements OnInit {
           this.router.navigate(['/sauces']);
         }),
         catchError((error) => {
-          console.log(error);
           this.loading = false;
-          this.errorMsg = error.message;
+          this.errorMsg = error.error;
           return EMPTY;
         })
       )

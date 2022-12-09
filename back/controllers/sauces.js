@@ -9,7 +9,7 @@ saucesRouter.get('/', async (req, res) => {
   const decodedToken = jwt.verify(token, process.env.SECRET);
 
   if (!token || !decodedToken) {
-    return res.status(401).json({ error: 'token missing or invalid' });
+    return res.status(401).send('token missing or invalid');
   }
   try {
     const sauces = await Sauce.find();
@@ -24,7 +24,7 @@ saucesRouter.get('/:id', async (req, res) => {
   const decodedToken = jwt.verify(token, process.env.SECRET);
 
   if (!token || !decodedToken) {
-    return res.status(401).json({ error: 'token missing or invalid' });
+    return res.status(401).send('token missing or invalid');
   }
   try {
     const idSauce = await Sauce.findById(req.params.id);
@@ -39,7 +39,7 @@ saucesRouter.post('/', multer, async (req, res) => {
   const decodedToken = jwt.verify(token, process.env.SECRET);
 
   if (!token || !decodedToken) {
-    return res.status(401).json({ error: 'token missing or invalid' });
+    return res.status(401).send('token missing or invalid');
   }
 
   try {
@@ -75,7 +75,7 @@ saucesRouter.put('/:id', multer, async (req, res) => {
   const decodedToken = jwt.verify(token, process.env.SECRET);
 
   if (!token || !decodedToken) {
-    return res.status(401).json({ error: 'token missing or invalid' });
+    return res.status(401).send('token missing or invalid');
   }
   try {
     let sauceObject = {};
@@ -104,9 +104,7 @@ saucesRouter.put('/:id', multer, async (req, res) => {
         id: req.params.id
       }
     );
-    res.status(200).json({
-      message: 'Sauce modifiée !'
-    });
+    res.status(200).send('Sauce modifiée !');
   } catch (error) {
     res.status(400).end(error);
   }
@@ -117,7 +115,7 @@ saucesRouter.delete('/:id', multer, async (req, res) => {
   const decodedToken = jwt.verify(token, process.env.SECRET);
 
   if (!decodedToken.id || !token || !decodedToken) {
-    return res.status(401).json({ error: 'token missing or invalid' });
+    return res.status(401).send('token missing or invalid');
   }
 
   try {
@@ -126,9 +124,9 @@ saucesRouter.delete('/:id', multer, async (req, res) => {
     const user = req.user;
 
     if (sauce.userId.toString() !== user.id.toString()) {
-      return res.status(401).json({
-        error: 'Unauthorized to access blog, fail to remove'
-      });
+      return res
+        .status(401)
+        .send('Unauthorized to access blog, fail to remove');
     } else {
       const filename = sauce.imageUrl.split('/images/')[1];
       fs.unlink(`images/${filename}`, async () => {
@@ -150,7 +148,7 @@ saucesRouter.post('/:id/like', async (req, res) => {
   const decodedToken = jwt.verify(token, process.env.SECRET);
 
   if (!decodedToken.id || !token || !decodedToken) {
-    return res.status(401).json({ error: 'token missing or invalid' });
+    return res.status(401).send('token missing or invalid');
   }
 
   try {
@@ -158,7 +156,7 @@ saucesRouter.post('/:id/like', async (req, res) => {
 
     if (req.body.like === 1) {
       if (sauce.usersLiked.includes(req.body.userId)) {
-        res.status(401).json({ error: 'Already liked' });
+        res.status(401).send('Already liked');
       }
       await Sauce.updateOne(
         { id: req.params.id },
@@ -167,10 +165,10 @@ saucesRouter.post('/:id/like', async (req, res) => {
           $push: { usersLiked: req.body.userId }
         }
       );
-      res.status(200).json({ message: 'Like!' });
+      res.status(200).send('Like!');
     } else if (req.body.like === -1) {
       if (sauce.usersDisliked.includes(req.body.userId)) {
-        res.status(401).json({ error: 'Already disliked' });
+        res.status(401).send('Already disliked');
       }
       await Sauce.updateOne(
         { id: req.params.id },
@@ -179,7 +177,7 @@ saucesRouter.post('/:id/like', async (req, res) => {
           $push: { usersDisliked: req.body.userId }
         }
       );
-      res.status(200).json({ message: 'Dislike!' });
+      res.status(200).send('Dislike!');
     } else {
       if (sauce.usersLiked.includes(req.body.userId)) {
         await Sauce.updateOne(
@@ -187,7 +185,7 @@ saucesRouter.post('/:id/like', async (req, res) => {
           { $pull: { usersLiked: req.body.userId }, $inc: { likes: -1 } }
         );
 
-        res.status(200).json({ message: 'Like cancelled!' });
+        res.status(200).send('Like cancelled!');
       } else if (sauce.usersDisliked.includes(req.body.userId)) {
         await Sauce.updateOne(
           { id: req.params.id },
@@ -197,7 +195,7 @@ saucesRouter.post('/:id/like', async (req, res) => {
           }
         );
 
-        res.status(200).json({ message: 'Dislike cancelled!' });
+        res.status(200).send('Dislike cancelled!');
       }
     }
   } catch (error) {
