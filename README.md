@@ -1,11 +1,15 @@
 # -openClass_projet_6
 
 the env is like this:
-MONGODB_URI=
-TEST_MONGODB_URI=
+MONGODB_URI=put your uri db
+
+TEST_MONGODB_URI= your test uri
+
 PORT=3000
-SECRET=
-NODE_ENV=
+
+SECRET= secret phrase
+
+NODE_ENV=test node
 
 # HotTakes
 
