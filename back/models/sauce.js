@@ -50,12 +50,11 @@ const sauceSchema = new mongoose.Schema({
   }
 });
 
-// sauceSchema.set('toJSON', {
-//   transform: (document, returnedObj) => {
-//     returnedObj.id = returnedObj._id.toString();
-//     delete returnedObj._id;
-//     delete returnedObj.__v;
-//   }
-// });
+sauceSchema.set('toJSON', {
+  transform: (document, returnedObj) => {
+    returnedObj._id = returnedObj._id.toString();
+    delete returnedObj.__v;
+  }
+});
 
 module.exports = mongoose.model('Sauce', sauceSchema);
