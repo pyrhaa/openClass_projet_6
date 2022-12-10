@@ -169,8 +169,11 @@ saucesRouter.post('/:id/like', async (req, res) => {
     const sauce = await Sauce.findOne({ _id: req.params.id });
 
     if (req.body.like === 1) {
-      if (sauce.usersLiked.includes(userId)) {
-        return res.status(401).send('Already liked');
+      if (
+        sauce.usersLiked.includes(userId) ||
+        sauce.usersDisliked.includes(userId)
+      ) {
+        return res.status(401).send('Already vote');
       }
 
       await Sauce.updateOne(
@@ -182,8 +185,11 @@ saucesRouter.post('/:id/like', async (req, res) => {
       );
       res.status(200).json({ message: 'Like!' });
     } else if (req.body.like === -1) {
-      if (sauce.usersDisliked.includes(userId)) {
-        return res.status(401).send('Already disliked');
+      if (
+        sauce.usersDisliked.includes(userId) ||
+        sauce.usersLiked.includes(userId)
+      ) {
+        return res.status(401).send('Already vote');
       }
       await Sauce.updateOne(
         { _id: req.params.id },
@@ -194,14 +200,20 @@ saucesRouter.post('/:id/like', async (req, res) => {
       );
       return res.status(200).json({ message: 'Dislike !' });
     } else {
-      if (sauce.usersLiked.includes(userId)) {
+      if (
+        sauce.usersLiked.includes(userId) &&
+        !sauce.usersDisliked.includes(userId)
+      ) {
         await Sauce.updateOne(
           { _id: req.params.id },
           { $pull: { usersLiked: userId }, $inc: { likes: -1 } }
         );
 
-        return res.status(200).json({ message: 'Like cancelled !' });
-      } else if (sauce.usersDisliked.includes(userId)) {
+        return res.status(200).json({ message: 'Vote cancelled !' });
+      } else if (
+        sauce.usersDisliked.includes(userId) &&
+        !sauce.usersLiked.includes(userId)
+      ) {
         await Sauce.updateOne(
           { _id: req.params.id },
           {
@@ -210,7 +222,9 @@ saucesRouter.post('/:id/like', async (req, res) => {
           }
         );
 
-        return res.status(200).json({ message: 'Dislike cancelled !' });
+        return res.status(200).json({ message: 'Vote cancelled !' });
+      } else {
+        return res.status(401).send('Already cancelled!');
       }
     }
   } catch (error) {
