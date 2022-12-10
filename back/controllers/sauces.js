@@ -5,13 +5,14 @@ const multer = require('../utils/multer-config');
 const fs = require('fs');
 
 saucesRouter.get('/', async (req, res) => {
-  const token = req.token;
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-
-  if (!token || !decodedToken) {
-    return res.status(401).send('token missing or invalid');
-  }
   try {
+    const token = req.token;
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+
+    if (!token || !decodedToken) {
+      return res.status(401).send('token missing or invalid');
+    }
+
     const sauces = await Sauce.find();
     res.json(sauces);
   } catch (error) {
@@ -20,13 +21,14 @@ saucesRouter.get('/', async (req, res) => {
 });
 
 saucesRouter.get('/:id', async (req, res) => {
-  const token = req.token;
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-
-  if (!token || !decodedToken) {
-    return res.status(401).send('token missing or invalid');
-  }
   try {
+    const token = req.token;
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+
+    if (!token || !decodedToken) {
+      return res.status(401).send('token missing or invalid');
+    }
+
     const idSauce = await Sauce.findById(req.params.id);
     res.json(idSauce.toJSON());
   } catch (error) {
@@ -35,14 +37,14 @@ saucesRouter.get('/:id', async (req, res) => {
 });
 
 saucesRouter.post('/', multer, async (req, res) => {
-  const token = req.token;
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-
-  if (!token || !decodedToken) {
-    return res.status(401).send('token missing or invalid');
-  }
-
   try {
+    const token = req.token;
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+
+    if (!token || !decodedToken) {
+      return res.status(401).send('token missing or invalid');
+    }
+
     const content = JSON.parse(req.body.sauce);
     const user = req.user;
 
@@ -71,17 +73,23 @@ saucesRouter.post('/', multer, async (req, res) => {
 });
 
 saucesRouter.put('/:id', multer, async (req, res) => {
-  const token = req.token;
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-
-  if (!token || !decodedToken) {
-    return res.status(401).send('token missing or invalid');
-  }
   try {
+    const token = req.token;
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+    const userId = decodedToken.id;
+
+    if (!token || !decodedToken) {
+      return res.status(401).send('token missing or invalid');
+    }
+    const sauce = await Sauce.findOne({ _id: req.params.id });
+
+    if (sauce.userId !== userId) {
+      return res.status(401).send('Unauthorized user');
+    }
+
     let sauceObject = {};
 
     if (req.file) {
-      const sauce = await Sauce.findOne({ _id: req.params.id });
       const filename = sauce.imageUrl.split('/images/')[1];
       fs.unlinkSync(`images/${filename}`);
       sauceObject = {
@@ -111,17 +119,21 @@ saucesRouter.put('/:id', multer, async (req, res) => {
 });
 
 saucesRouter.delete('/:id', multer, async (req, res) => {
-  const token = req.token;
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-
-  if (!decodedToken.id || !token || !decodedToken) {
-    return res.status(401).send('token missing or invalid');
-  }
-
   try {
+    const token = req.token;
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+    const userId = decodedToken.id;
     const id = req.params.id;
     const sauce = await Sauce.findById(id);
     const user = req.user;
+
+    if (!token || !decodedToken) {
+      return res.status(401).send('token missing or invalid');
+    }
+
+    if (sauce.userId !== userId) {
+      return res.status(401).send('Unauthorized user');
+    }
 
     if (sauce.userId.toString() !== user.id.toString()) {
       return res
@@ -144,15 +156,19 @@ saucesRouter.delete('/:id', multer, async (req, res) => {
 });
 
 saucesRouter.post('/:id/like', async (req, res) => {
-  const token = req.token;
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-
-  if (!decodedToken.id || !token || !decodedToken) {
-    return res.status(401).send('token missing or invalid');
-  }
-
   try {
+    const token = req.token;
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+    const userId = decodedToken.id;
+
+    if (!token || !decodedToken) {
+      return res.status(401).send('token missing or invalid');
+    }
     const sauce = await Sauce.findOne({ _id: req.params.id });
+
+    if (sauce.userId !== userId) {
+      return res.status(401).send('Unauthorized user');
+    }
 
     if (req.body.like === 1) {
       if (sauce.usersLiked.includes(req.body.userId)) {
