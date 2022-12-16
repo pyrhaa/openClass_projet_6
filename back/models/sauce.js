@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+//Utilisation de la méthode "Schema" de "Mongoose" qui contient tous les champs souhaités et leur type
 const sauceSchema = new mongoose.Schema({
   userId: {
     type: String,
@@ -50,6 +51,7 @@ const sauceSchema = new mongoose.Schema({
   }
 });
 
+//change objectID en string et de __v
 sauceSchema.set('toJSON', {
   transform: (document, returnedObj) => {
     returnedObj._id = returnedObj._id.toString();
@@ -57,4 +59,5 @@ sauceSchema.set('toJSON', {
   }
 });
 
+//Exportation du Schema pour le rendre disponible pour l'application "Express"
 module.exports = mongoose.model('Sauce', sauceSchema);

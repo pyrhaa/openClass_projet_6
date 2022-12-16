@@ -1,4 +1,6 @@
+//Permet de vérifier les tokens d'authentification
 const jwt = require('jsonwebtoken');
+//Permet de chiffrer des données
 const bcrypt = require('bcrypt');
 const loginRouter = require('express').Router();
 const User = require('../models/user');
@@ -6,6 +8,7 @@ const User = require('../models/user');
 loginRouter.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
+  //Recherche si le user et son password existent
   const user = await User.findOne({ email });
   const passwordCorrect =
     user === null ? false : await bcrypt.compare(password, user.password);
@@ -19,7 +22,7 @@ loginRouter.post('/login', async (req, res) => {
     id: user._id
   };
 
-  // token expires in 60*60 seconds, that is, in one hour
+  // token expire dans 60*60 secondes, donc dans 1 heure
   const token = jwt.sign(userForToken, process.env.SECRET, {
     expiresIn: 60 * 60
   });

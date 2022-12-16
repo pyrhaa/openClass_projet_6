@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 
+//Utilisation de la méthode "Schema" de "Mongoose" qui contient tous les champs souhaités et leur type
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -16,8 +17,10 @@ const userSchema = new mongoose.Schema({
   }
 });
 
+//Plugin qui empêche deux utilisateurs d'avoir la même adresse email
 userSchema.plugin(uniqueValidator);
 
+//change objectID en string et suppression du password et de __v
 userSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject._id = returnedObject._id.toString();
@@ -26,6 +29,7 @@ userSchema.set('toJSON', {
   }
 });
 
+//Exportation du Schema pour le rendre disponible pour l'application "Express"
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

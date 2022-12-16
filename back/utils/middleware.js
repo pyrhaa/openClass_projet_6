@@ -1,4 +1,5 @@
 const logger = require('./logger');
+//Permet de vérifier les tokens d'authentification
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
@@ -16,9 +17,10 @@ const errorHandler = (error, req, res, next) => {
   }
 
   logger.error(error.message);
-  next(error);
+  return next(error);
 };
 
+//extraction du token jwt sous format BEARER
 const tokenExtractor = (req, res, next) => {
   const authorization = req.get('authorization');
   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
@@ -30,17 +32,24 @@ const tokenExtractor = (req, res, next) => {
 };
 
 const userExtractor = async (req, res, next) => {
-  if (req.token) {
+  try {
+    //Extraction du token du header authorization
+    const token = req.token;
+    //Décode le token
     const decodedToken = jwt.verify(req.token, process.env.SECRET);
-    if (decodedToken.id) {
+
+    //Extrait l'id utilisateur et compare à celui extrait du token
+    if (!token || !decodedToken) {
+      return res.status(401).send('token missing or invalid');
+    } else if (decodedToken.id) {
       req.user = await User.findById(decodedToken.id);
     } else {
-      req.user = null;
+      return next();
     }
-  } else {
-    req.user = null;
+  } catch (e) {
+    return res.status(401).json({ error: e });
   }
-  next();
+  return next();
 };
 
 module.exports = {

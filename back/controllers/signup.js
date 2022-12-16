@@ -1,3 +1,4 @@
+//Permet de chiffrer des données
 const bcrypt = require('bcrypt');
 const usersRouter = require('express').Router();
 const User = require('../models/user');
@@ -22,6 +23,7 @@ usersRouter.post('/signup', async (req, res) => {
       return res.status(400).send('password must have at least 3 characters');
     }
 
+    //Appelle de bcrypt qui hasher le mot de passe 10 fois ici et renvoie une promise
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
@@ -29,6 +31,8 @@ usersRouter.post('/signup', async (req, res) => {
       email,
       password: passwordHash
     });
+
+    //Enregristre dans la base de données
     try {
       const savedUser = await user.save();
       res.status(201).json(savedUser);
