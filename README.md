@@ -1,6 +1,15 @@
 # -openClass_projet_6
 
-the env is like this:
+## Installation :
+
+First, install in the back and in the front with command `npm install`
+
+### Backend :
+
+create the repositiry `images`\
+create the file `.env` like this :
+
+```
 MONGODB_URI=put your uri db
 
 TEST_MONGODB_URI= your test uri
@@ -10,6 +19,21 @@ PORT=3000
 SECRET= secret phrase
 
 NODE_ENV=test node
+
+```
+
+Start the server with command `npm start`
+
+### Frontend :
+
+Start the front with the command `npm start`\
+And go to `http://localhost:4200/`
+
+## To clone the project :
+
+```terminal
+git clone https://github.com/pyrhaa/openClass_projet_6.git
+```
 
 # HotTakes
 
